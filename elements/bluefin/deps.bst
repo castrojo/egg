@@ -18,6 +18,7 @@ depends:
   - freedesktop-sdk.bst:components/podman.bst
   - freedesktop-sdk.bst:components/containers-common.bst
   - freedesktop-sdk.bst:components/skopeo.bst
+  # FIXME: figure out why gcc isn't appearing in the image with this line
   - freedesktop-sdk.bst:components/gcc.bst
   - gnome-build-meta.bst:gnomeos-deps/distrobox.bst
   - gnome-build-meta.bst:gnomeos-deps/just.bst
