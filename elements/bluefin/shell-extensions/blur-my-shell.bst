@@ -11,6 +11,7 @@ build-depends:
 
 depends:
 - freedesktop-sdk.bst:components/gettext.bst
+- freedesktop-sdk.bst:components/jq.bst
 - gnome-build-meta.bst:core/gnome-shell.bst
 
 variables:
@@ -19,6 +20,14 @@ variables:
 config:
   install-commands:
   - |
-    DESTDIR=%{install-root} %{make-install}
+    %{make}
+
+    _uuid="$(jq -r .uuid metadata.json)"
+    install -d "%{install-root}/usr/share/gnome-shell/extensions/${_uuid}"
+    bsdtar xvf "build/${_uuid}.shell-extension.zip" -C "%{install-root}/usr/share/gnome-shell/extensions/${_uuid}/" --no-same-owner
+
+    mv "%{install-root}/usr/share/gnome-shell/extensions/${_uuid}/locale" "%{install-root}/usr/share"
+    install -Dm644 schemas/*.gschema.xml -t "%{install-root}/usr/share/glib-2.0/schemas/"
+    rm -rf "%{install-root}/usr/share/gnome-shell/extensions/${_uuid}/schemas"
   - |
     %{install-extra}
