@@ -3,16 +3,25 @@ kind: manual
 build-depends:
   - freedesktop-sdk.bst:public-stacks/runtime-minimal.bst
 
+depends:
+  - freedesktop-sdk.bst:public-stacks/runtime-minimal.bst
+
 sources:
-  - kind: zip
-    url: github_files:JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip
-    ref: 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf
+  - kind: git_repo
+    url: github:JetBrains/JetBrainsMono
+    track: v*
+    ref: v2.304-0-gcd5227bd1f61dff3bbd6c814ceaf7ffd95e947d9
+
 variables:
+  license-files-extra: "OFL.txt"
+  fontdir: "%{install-root}%{datadir}/fonts"
   strip-binaries: ""
 
 config:
   install-commands:
-    - mkdir -p "%{install-root}%{datadir}/fonts/JetBrains Mono"
-    - cp -r ttf variable webfonts "%{install-root}%{datadir}/fonts/JetBrains Mono"
+    - |
+      mkdir -p "%{fontdir}/JetBrains Mono"
+
+      install -p -m0644 fonts/otf/*.otf "%{fontdir}/JetBrains Mono"
     - |
       %{install-extra}
