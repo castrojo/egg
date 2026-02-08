@@ -11,10 +11,10 @@ build *ARGS:
     set -eu
 
     bst build oci/bluefin.bst
-    bst artifact checkout --tar - oci/bluefin.bst | run0 podman load
+    bst artifact checkout --tar - oci/bluefin.bst | pkexec podman load
 
 build-containerfile $image_name=image_name:
-    sudo podman build --squash-all -t "${image_name}:latest" .
+    sudo podman build --security-opt label=type:unconfined_t --squash-all -t "${image_name}:latest" .
 
 bootc *ARGS:
     sudo podman run \
