@@ -186,7 +186,9 @@ show-me-the-future:
 
     # ── Configuration ─────────────────────────────────────────────
     TAIL_LINES=5
-    SPINNER_CHARS='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    PIE_CHARS=(◯ ◔ ◑ ◕)  # filling pie: empty, quarter, half, three-quarter
+    PIE_DONE=●
+    PIE_FAIL=◍
     LOGDIR=$(mktemp -d /tmp/egg-build-XXXXX)
 
     TERM_WIDTH=$(tput cols 2>/dev/null || echo 80)
@@ -197,6 +199,7 @@ show-me-the-future:
     STEP_NAMES=("Build OCI image" "Bootable disk" "Launch VM")
     STEP_STATUS=("pending" "pending" "pending")
     STEP_TIMES=("" "" "")
+    STEP_ELAPSED=(0 0 0)
 
     # Colors (ANSI 256)
     COLOR_ACCENT=212
@@ -257,29 +260,38 @@ show-me-the-future:
             'Building Bluefin from source and booting it in a VM'
     }
 
+    # Pie icon for active steps: cycles ◯ ◔ ◑ ◕ based on elapsed seconds
+    pie_icon_for_elapsed() {
+        local secs=$1
+        local idx=$(( (secs / 3) % ${#PIE_CHARS[@]} ))
+        printf '%s' "${PIE_CHARS[$idx]}"
+    }
+
     render_step_bar() {
-        local spin_char="${1:-}"
         local parts=()
         for i in 0 1 2; do
             local name="${STEP_NAMES[$i]}"
             local status="${STEP_STATUS[$i]}"
             local time_str="${STEP_TIMES[$i]}"
+            local elapsed_secs="${STEP_ELAPSED[$i]:-0}"
             local time_suffix=""
             if [[ -n "$time_str" ]]; then
                 time_suffix=" (${time_str})"
             fi
             case "$status" in
                 pending)
-                    parts+=("$(gum style --foreground $COLOR_DIM "○ ${name}")")
+                    parts+=("$(gum style --foreground $COLOR_DIM "◯ ${name}")")
                     ;;
                 active)
-                    parts+=("$(gum style --foreground $COLOR_ACCENT --bold "${spin_char} ${name}$(gum style --foreground $COLOR_TIME "${time_suffix}")")")
+                    local icon
+                    icon=$(pie_icon_for_elapsed "$elapsed_secs")
+                    parts+=("$(gum style --foreground $COLOR_ACCENT --bold "${icon} ${name}$(gum style --foreground $COLOR_TIME "${time_suffix}")")")
                     ;;
                 done)
-                    parts+=("$(gum style --foreground $COLOR_OK "✓ ${name}$(gum style --foreground $COLOR_TIME "${time_suffix}")")")
+                    parts+=("$(gum style --foreground $COLOR_OK "${PIE_DONE} ${name}$(gum style --foreground $COLOR_TIME "${time_suffix}")")")
                     ;;
                 failed)
-                    parts+=("$(gum style --foreground $COLOR_ERR "✗ ${name}$(gum style --foreground $COLOR_TIME "${time_suffix}")")")
+                    parts+=("$(gum style --foreground $COLOR_ERR "${PIE_FAIL} ${name}$(gum style --foreground $COLOR_TIME "${time_suffix}")")")
                     ;;
             esac
         done
@@ -314,7 +326,6 @@ show-me-the-future:
 
         STEP_STATUS[$step_idx]="active"
         local start_time=$SECONDS
-        local spin_idx=0
         local total_area=$((TAIL_LINES + 2))
 
         # Run command in background
@@ -330,21 +341,20 @@ show-me-the-future:
         while kill -0 "$BG_PID" 2>/dev/null; do
             local elapsed=$((SECONDS - start_time))
             STEP_TIMES[$step_idx]=$(format_time $elapsed)
-            local sc=${SPINNER_CHARS:$((spin_idx % ${#SPINNER_CHARS})):1}
+            STEP_ELAPSED[$step_idx]=$elapsed
 
             # Move cursor up: tail area + step bar line
             printf '\033[%dA\r' $((total_area + 1))
 
             # Re-render step bar
             printf '\033[2K'
-            render_step_bar "$sc"
+            render_step_bar
 
             # Re-render tail area
             render_separator
             render_tail "$logfile"
             render_separator
 
-            spin_idx=$((spin_idx + 1))
             sleep 0.1
         done
 
@@ -366,7 +376,7 @@ show-me-the-future:
         # Final render: update step bar, clear tail area
         printf '\033[%dA\r' $((total_area + 1))
         printf '\033[2K'
-        render_step_bar ""
+        render_step_bar
         for _ in $(seq 1 $total_area); do
             printf '\033[2K\n'
         done
@@ -385,7 +395,7 @@ show-me-the-future:
         done
         printf '\033[?25h'  # restore cursor
         echo ""
-        render_step_bar ""
+        render_step_bar
         echo ""
         gum style \
             --foreground $COLOR_ERR \
@@ -407,7 +417,7 @@ show-me-the-future:
     # ── Main flow ─────────────────────────────────────────────────
     render_banner
     echo ""
-    render_step_bar ""
+    render_step_bar
     echo ""
 
     # Step 1: Build OCI image
@@ -418,11 +428,12 @@ show-me-the-future:
 
     # Step 3: Launch VM (interactive -- no tail view)
     STEP_STATUS[2]="active"
+    STEP_ELAPSED[2]=0
     vm_start=$SECONDS
 
     # Re-render step bar for step 3
     printf '\033[1A\r\033[2K'
-    render_step_bar "▸"
+    render_step_bar
     echo ""
 
     # Restore cursor before handing off to QEMU
@@ -434,7 +445,7 @@ show-me-the-future:
 
     # ── Completion ────────────────────────────────────────────────
     echo ""
-    render_step_bar ""
+    render_step_bar
     echo ""
     gum style \
         --foreground $COLOR_OK \
