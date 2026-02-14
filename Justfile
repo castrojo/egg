@@ -40,10 +40,10 @@ build:
     just bst build oci/bluefin.bst
 
     echo "==> Exporting OCI image and loading into podman..."
-    just bst artifact checkout --tar - oci/bluefin.bst | sudo podman load
+    just bst artifact checkout --tar - oci/bluefin.bst | podman load
 
     echo "==> Build complete. Image loaded as {{image_name}}:{{image_tag}}"
-    sudo podman images | grep -E "{{image_name}}|REPOSITORY" || true
+    podman images | grep -E "{{image_name}}|REPOSITORY" || true
 
 # ── Containerfile build (alternative) ────────────────────────────────
 build-containerfile $image_name=image_name:
