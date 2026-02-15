@@ -39,18 +39,16 @@ build:
     echo "==> Building OCI image with BuildStream (inside bst2 container)..."
     just bst build oci/bluefin.bst
 
-    echo "==> Exporting OCI image and loading into podman..."
-    # Workaround: BuildStream's generated source plugin pollutes stdout during checkout --tar
-    # So we checkout to a temp directory, create tar ourselves, then clean up
-    CHECKOUT_DIR=".tmp-oci-checkout"
-    mkdir -p "${CHECKOUT_DIR}"
-    trap "rm -rf ${CHECKOUT_DIR}" EXIT
-    just bst artifact checkout --directory "${CHECKOUT_DIR}" oci/bluefin.bst
-    tar -C "${CHECKOUT_DIR}" -c . | podman load
-    rm -rf "${CHECKOUT_DIR}"  # Clean up immediately (trap is backup)
+    echo "==> Exporting OCI image..."
+    rm -rf .build-out
+    just bst artifact checkout oci/bluefin.bst --directory /src/.build-out
+
+    echo "==> Loading OCI image into podman..."
+    sudo skopeo copy oci:.build-out containers-storage:{{image_name}}:{{image_tag}}
+    rm -rf .build-out
 
     echo "==> Build complete. Image loaded as {{image_name}}:{{image_tag}}"
-    podman images | grep -E "{{image_name}}|REPOSITORY" || true
+    sudo podman images | grep -E "{{image_name}}|REPOSITORY" || true
 
 # ── Containerfile build (alternative) ────────────────────────────────
 build-containerfile $image_name=image_name:
@@ -78,7 +76,7 @@ generate-bootable-image $base_dir=base_dir $filesystem=filesystem:
     fi
 
     echo "==> Installing OS to disk image via bootc..."
-    just bootc install to-disk --composefs-backend \
+    just bootc install to-disk \
         --via-loopback /data/bootable.raw \
         --filesystem "${filesystem}" \
         --wipe \
