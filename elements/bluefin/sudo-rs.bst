@@ -24,8 +24,10 @@ config:
   - ln -sr "%{install-root}/usr/bin/sudo" "%{install-root}/usr/bin/sudoedit"
 
 sources:
-- kind: local
-  path: files/sudo-rs
+- kind: git_repo
+  url: https://github.com/memorysafety/sudo-rs.git
+  track: 74e0db4f7f89b7429dd7ebbdfa94b0c55eba40cb
+  ref: 74e0db4f7f89b7429dd7ebbdfa94b0c55eba40cb
 - kind: cargo2
   ref:
   - kind: registry

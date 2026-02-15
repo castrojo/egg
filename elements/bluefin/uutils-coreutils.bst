@@ -19,8 +19,10 @@ depends:
 - freedesktop-sdk.bst:public-stacks/runtime-minimal.bst
 
 sources:
-- kind: local
-  path: files/uutils-coreutils
+- kind: git_repo
+  url: https://github.com/uutils/coreutils.git
+  track: e7f2fd9c80417265707e54fb0b260531c86cc39e
+  ref: e7f2fd9c80417265707e54fb0b260531c86cc39e
 - kind: cargo2
   ref:
   - kind: registry
