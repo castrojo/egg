@@ -10,6 +10,10 @@ depends:
 
   - bluefin/tailscale.bst
 
+  - bluefin/glow.bst
+  - bluefin/gum.bst
+  - bluefin/fzf.bst
+
   - bluefin/common.bst
   - bluefin/wallpapers.bst
 
