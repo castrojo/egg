@@ -1,13 +1,132 @@
 ![Conga](https://github.com/user-attachments/assets/2e3dc15c-4f49-48e4-98f8-bcf448f8af2f)
 
 # egg
-Bluefin's Primal Form - the buildstream itself. Smol.
 
-# Trying it
+Bluefin's Primal Form -- build a custom GNOME Linux desktop entirely from source on your laptop.
 
-1. Clone this repo
-2. `just show-me-the-future` to start building
-3. First run takes a long time to populate the cache
-4. A VM should pop up with bluefin!
+No CI pipelines. No cloud infrastructure. No container registries. Just `podman`, `just`, and disk space.
 
-Sorry Luis this is all I got for now. 
+## Make It Yours
+
+1. **Fork this repo** and clone your fork
+2. **Edit the package list** in `elements/bluefin/deps.bst` -- add or remove lines to customize what ships in your image
+3. **Build and boot:**
+   ```
+   just show-me-the-future
+   ```
+
+That's it. The first build takes about an hour (it pulls cached artifacts from GNOME's upstream servers). After that, rebuilds only touch what changed.
+
+## Prerequisites
+
+You need [podman](https://podman.io/docs/installation), [just](https://just.systems/man/en/packages.html), and [QEMU](https://www.qemu.org/) with UEFI firmware.
+
+On Fedora/Bluefin:
+
+```bash
+sudo dnf install podman just qemu-system-x86 edk2-ovmf
+```
+
+**(WIP)** `just preflight` -- a preflight check that validates your setup and auto-installs missing tools (like QEMU) via [Homebrew](https://brew.sh), reducing hard prerequisites to just `podman` and `just`.
+
+## How It Works
+
+[BuildStream](https://buildstream.build/) resolves a dependency graph rooted at `elements/oci/bluefin.bst`, pulls pre-built artifacts from GNOME's public cache, builds anything that's missing, and produces a bootable OCI container image. The image is installed to a virtual disk and booted in QEMU.
+
+All build artifacts are cached locally in `~/.cache/buildstream/`. There is no cloud dependency beyond the initial artifact fetch from GNOME's servers. Your laptop is the build farm.
+
+### Disk Space
+
+| What | Size |
+|---|---|
+| Build cache (after first build) | ~50 GB |
+| Bootable VM disk | 30 GB (sparse) |
+| Total recommended free | **100 GB** |
+
+### Step-by-Step Commands
+
+If you prefer more control over each step:
+
+```bash
+just build                     # Build the OCI image (~1 hour first time, minutes after)
+just generate-bootable-image   # Create a bootable disk from the image
+just boot-vm                   # Launch QEMU VM -- a GNOME desktop appears
+```
+
+### Iterative Development
+
+After the first build, the edit-rebuild-boot cycle is fast:
+
+```bash
+# 1. Edit elements/bluefin/deps.bst (or any element)
+# 2. Rebuild -- only changed elements are rebuilt
+just build
+# 3. Regenerate the disk and boot
+just generate-bootable-image
+just boot-vm
+```
+
+**(WIP)** Local OTA updates -- push rebuilt images to a local registry and update a running VM without rebooting the full pipeline:
+
+```bash
+just registry-start              # Start local OCI registry
+just build && just publish       # Build and push to local registry
+# In VM: sudo bootc upgrade      # Pull the update over the network
+```
+
+## Customizing Packages
+
+The file `elements/bluefin/deps.bst` controls what ships in the image. Each line is a BuildStream element:
+
+```yaml
+depends:
+  # GNOME Shell extensions
+  - bluefin/gnome-shell-extensions.bst
+
+  # CLI tools
+  - bluefin/glow.bst
+  - bluefin/gum.bst
+  - bluefin/fzf.bst
+
+  # Fonts
+  - bluefin/jetbrains-mono.bst
+
+  # ... add your own here
+```
+
+To **remove a package**: delete its line from `deps.bst`.
+
+To **add a package**: create a `.bst` element in `elements/bluefin/` and add it to `deps.bst`. Look at existing elements like `elements/bluefin/glow.bst` for a simple example -- it downloads a pre-built binary and installs it to the right path.
+
+Packages from the upstream [freedesktop-sdk](https://gitlab.com/freedesktop-sdk/freedesktop-sdk) and [gnome-build-meta](https://gitlab.gnome.org/GNOME/gnome-build-meta) projects can be included directly by referencing their junction path:
+
+```yaml
+  - freedesktop-sdk.bst:components/some-package.bst
+  - gnome-build-meta.bst:gnomeos-deps/some-other-package.bst
+```
+
+## Project Structure
+
+```
+elements/
+  bluefin/           Bluefin-specific packages (edit these)
+    deps.bst         Master package list (start here)
+  core/              Core system overrides (bootc, grub, ptyxis)
+  oci/               Image assembly pipeline
+    bluefin.bst      THE build target
+  freedesktop-sdk.bst   Junction to freedesktop-sdk
+  gnome-build-meta.bst  Junction to gnome-build-meta
+files/               Static files (plymouth theme, etc.)
+patches/             Patches applied to upstream projects
+Justfile             All build commands
+```
+
+## Roadmap
+
+These features are planned but not yet implemented:
+
+- **`just preflight`** -- automated prerequisite checking with Homebrew auto-install
+- **Local OTA updates** -- `just registry-start` / `just publish` for iterative VM updates via `bootc upgrade`
+- **`just add-package <url>`** -- scaffolding a new package element from a GitHub release URL
+- **Rebranding guide** -- documentation for people who want to change the image name/identity
+- **Multi-arch builds** -- aarch64 support
