@@ -139,7 +139,7 @@ The R2 cache uses `bazel-remote` v2.6.1 as a CAS-to-S3 bridge:
 
 The `buildstream-ci.conf` generated during CI uses these settings:
 - `on-error: continue` -- Find ALL build failures, don't stop at first
-- `fetchers: 32` -- Aggressive parallel downloads from artifact caches
+- `fetchers: 12` -- Parallel downloads from artifact caches
 - `builders: 1` -- GHA runners have 4 vCPUs; conservative to avoid OOM
 - `retry-failed: True` -- Auto-retry flaky builds
 - `error-lines: 80` -- Generous error context in logs
@@ -206,6 +206,20 @@ All agents MUST load and follow these skills before acting:
 | `receiving-code-review` | When processing review feedback |
 | `using-git-worktrees` | When starting isolated feature work |
 | `dispatching-parallel-agents` | When facing 2+ independent tasks |
+| `adding-a-package` | When adding a new software package to the image |
+| `buildstream-element-reference` | When writing or reviewing .bst element files |
+| `packaging-pre-built-binaries` | When packaging pre-built static binaries |
+| `packaging-zig-projects` | When packaging Zig build system projects |
+| `packaging-rust-cargo-projects` | When packaging Rust/Cargo projects with cargo2 sources |
+| `packaging-gnome-shell-extensions` | When packaging GNOME Shell extensions |
+| `packaging-go-projects` | When packaging Go projects for BuildStream |
+| `oci-layer-composition` | When working with OCI layers or the image assembly pipeline |
+| `patching-upstream-junctions` | When patching freedesktop-sdk or gnome-build-meta elements |
+| `removing-packages` | When removing a package from the Bluefin image |
+| `updating-upstream-refs` | When updating upstream source refs or dependency versions |
+| `debugging-bst-build-failures` | When diagnosing BuildStream build errors |
+| `ci-pipeline-operations` | When working with the GitHub Actions CI pipeline |
+| `local-e2e-testing` | When building or testing the OCI image locally |
 
 Skills are vendored at `.opencode/skills/` and auto-discovered by the agent runtime. Load them with the `Skill` tool by name (e.g., `brainstorming`, `writing-plans`).
 
