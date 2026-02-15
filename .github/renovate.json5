@@ -25,20 +25,6 @@
       "versioningTemplate": "loose"
     },
 
-    // ── bazel-remote binary download in CI workflow ──
-    // Matches the download URL and SHA256 checksum as a pair
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/\\.github/workflows/build-egg\\.yml$/"
-      ],
-      "matchStrings": [
-        "https://github\\.com/(?<depName>buchgr/bazel-remote)/releases/download/v(?<currentValue>\\d+\\.\\d+\\.\\d+)/bazel-remote-[\\d.]+-linux-amd64\"\\n\\s+echo \"(?<currentDigest>[a-f0-9]{64})"
-      ],
-      "datasourceTemplate": "github-releases",
-      "extractVersionTemplate": "^v(?<version>.+)$"
-    },
-
     // ── BuildStream plugin tarballs from PyPI ──
     // Matches: url: pypi:<hash-path>/buildstream-plugins-<version>.tar.gz
     //          ref: <sha256>
@@ -97,7 +83,6 @@
       "automerge": true,
       "matchUpdateTypes": ["patch"],
       "matchDepNames": [
-        "buchgr/bazel-remote",
         "rclone/rclone",
         "actions/checkout",
         "actions/cache",
