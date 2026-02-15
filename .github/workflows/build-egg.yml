@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: Testing
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read
       packages: write
@@ -34,20 +34,42 @@ jobs:
       - name: Pull BuildStream container image
         run: podman pull "$BST2_IMAGE"
 
-      - name: Cache BuildStream sources
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      - name: Mount BuildStream cache (sticky disk)
+        uses: useblacksmith/stickydisk@v1
         with:
-          path: ~/.cache/buildstream/sources
-          key: bst-sources-${{ hashFiles('elements/**/*.bst', 'project.conf') }}
-          restore-keys: |
-            bst-sources-
+          key: ${{ github.repository }}-bst-cache
+          path: ~/.cache/buildstream
 
-      - name: Prepare BuildStream cache directory
+      - name: Mount BuildStream sources (sticky disk)
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-bst-sources
+          path: ~/.cache/buildstream-sources
+
+      - name: Prepare BuildStream cache layout
         run: |
-          mkdir -p "$HOME/.cache/buildstream/sources"
-          mkdir -p "$HOME/.cache/buildstream/cas"
-          mkdir -p "$HOME/.cache/buildstream/artifacts"
-          mkdir -p "$HOME/.cache/buildstream/source_protos"
+          # Ensure subdirectories exist (first run on fresh sticky disk)
+          mkdir -p ~/.cache/buildstream/{cas,artifacts,source_protos}
+          mkdir -p ~/.cache/buildstream-sources
+
+          # Symlink sources into the expected BuildStream location
+          # BuildStream expects sources at ~/.cache/buildstream/sources/
+          if [ ! -e ~/.cache/buildstream/sources ]; then
+            ln -s ~/.cache/buildstream-sources ~/.cache/buildstream/sources
+          elif [ -d ~/.cache/buildstream/sources ] && [ ! -L ~/.cache/buildstream/sources ]; then
+            # Real dir exists (e.g. from preseed) -- move contents, replace with symlink
+            if [ "$(ls -A ~/.cache/buildstream/sources 2>/dev/null)" ]; then
+              cp -a ~/.cache/buildstream/sources/. ~/.cache/buildstream-sources/
+            fi
+            rm -rf ~/.cache/buildstream/sources
+            ln -s ~/.cache/buildstream-sources ~/.cache/buildstream/sources
+          fi
+
+          echo "=== Sticky disk status ==="
+          echo "CAS:       $(du -sh ~/.cache/buildstream/cas 2>/dev/null | cut -f1 || echo 'empty')"
+          echo "Artifacts: $(du -sh ~/.cache/buildstream/artifacts 2>/dev/null | cut -f1 || echo 'empty')"
+          echo "Sources:   $(du -sh ~/.cache/buildstream-sources 2>/dev/null | cut -f1 || echo 'empty')"
+          df -h ~/.cache/buildstream ~/.cache/buildstream-sources
 
       # ── Restore cache from R2 ─────────────────────────────────────────
       # CAS objects are stored as a single zstd-compressed tar in R2.
