@@ -21,6 +21,8 @@ digraph choose_kind {
     "Source with CMake" [shape=box];
     "Rust/Cargo project" [shape=box];
     "Go project" [shape=box];
+    "Zig project" [shape=box];
+    "GNOME Shell extension" [shape=box];
     "Config files only" [shape=box];
     "Dependency group" [shape=box];
 
@@ -31,6 +33,8 @@ digraph choose_kind {
     "What are you packaging?" -> "Source with CMake" [label="CMakeLists.txt exists"];
     "What are you packaging?" -> "Rust/Cargo project" [label="Cargo.toml exists"];
     "What are you packaging?" -> "Go project" [label="go.mod exists"];
+    "What are you packaging?" -> "Zig project" [label="build.zig exists"];
+    "What are you packaging?" -> "GNOME Shell extension" [label="metadata.json + extension.js"];
     "What are you packaging?" -> "Config files only" [label="just files to install"];
     "What are you packaging?" -> "Dependency group" [label="aggregate other elements"];
 
@@ -39,8 +43,10 @@ digraph choose_kind {
     "make kind" [shape=ellipse];
     "autotools kind" [shape=ellipse];
     "cmake kind" [shape=ellipse];
-    "cargo kind + cargo2 sources" [shape=ellipse];
+    "make kind + cargo2 sources" [shape=ellipse];
+    "manual kind + zig build" [shape=ellipse];
     "manual kind (see note)" [shape=ellipse];
+    "import kind + GNOME Shell layout" [shape=ellipse];
     "import kind" [shape=ellipse];
     "stack kind" [shape=ellipse];
 
@@ -49,14 +55,22 @@ digraph choose_kind {
     "Source with Makefile" -> "make kind";
     "Source with autotools" -> "autotools kind";
     "Source with CMake" -> "cmake kind";
-    "Rust/Cargo project" -> "cargo kind + cargo2 sources";
+    "Rust/Cargo project" -> "make kind + cargo2 sources";
     "Go project" -> "manual kind (see note)";
+    "Zig project" -> "manual kind + zig build";
+    "GNOME Shell extension" -> "import kind + GNOME Shell layout";
     "Config files only" -> "import kind";
     "Dependency group" -> "stack kind";
 }
 ```
 
-**Go projects:** Most common approach is `make` kind with vendored deps. See "Not Yet Documented" section.
+**Go projects:** `make` kind with vendored deps. **SUB-SKILL:** `packaging-go-projects`
+
+**Rust/Cargo projects:** `make` kind (not `cargo` kind) with `cargo2` sources for vendored crates. **SUB-SKILL:** `packaging-rust-cargo-projects`
+
+**Zig projects:** `manual` kind with `zig build` commands. **SUB-SKILL:** `packaging-zig-projects`
+
+**GNOME Shell extensions:** `import` kind with GNOME Shell extension directory layout. **SUB-SKILL:** `packaging-gnome-shell-extensions`
 
 **Pre-built binaries:** **REQUIRED SUB-SKILL:** Use superpowers:packaging-pre-built-binaries for multi-arch dispatch, `strip-binaries`, and source patterns.
 
@@ -118,3 +132,5 @@ install-commands:
 - `packaging-rust-cargo-projects` -- Cargo/Rust packaging
 - `oci-layer-composition` -- how `elements/oci/layers/` assembles the final image
 - `patching-upstream-junctions` -- adding patches to freedesktop-sdk or gnome-build-meta
+- `debugging-bst-build-failures` -- diagnosing and fixing build failures
+- `updating-upstream-refs` -- updating junction refs to newer upstream versions
