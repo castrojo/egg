@@ -110,12 +110,11 @@ install-commands:
 | Forgot to add element to `deps.bst` | Element builds but won't be included in the image |
 | Wrong dependency stack | Use `freedesktop-sdk.bst:public-stacks/runtime-minimal.bst` for runtime deps; `buildsystem-*` stacks for build-deps |
 
-## Not Yet Documented
+## Related Skills
 
-Future skills needed for:
-
-- **Packaging Go projects** -- three approaches: `make` with vendored deps, `manual` with `go_module` sources, `manual` with `go_build` plugin
-- **Packaging Rust/Cargo projects** -- `cargo` kind, `cargo2` sources, offline vendor caching
-- **OCI layer composition** -- how `elements/oci/layers/` assembles the final image
-- **Patching upstream junctions** -- adding patches to freedesktop-sdk or gnome-build-meta
-- **Removing packages from the build** -- safely unwiring elements and cleaning up
+- `removing-packages` -- reverse workflow (safely removing a package)
+- `packaging-pre-built-binaries` -- multi-arch pre-built binary dispatch
+- `packaging-go-projects` -- Go project packaging approaches
+- `packaging-rust-cargo-projects` -- Cargo/Rust packaging
+- `oci-layer-composition` -- how `elements/oci/layers/` assembles the final image
+- `patching-upstream-junctions` -- adding patches to freedesktop-sdk or gnome-build-meta
