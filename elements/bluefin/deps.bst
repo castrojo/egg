@@ -18,6 +18,9 @@ depends:
   - bluefin/jetbrains-mono.bst
   - bluefin/jetbrains-mono-nerd-font.bst
 
+  # bootupd is required for bootc install to-disk
+  - core/bootupd.bst
+
   # Include things missing from the gnomeos base image
   - freedesktop-sdk.bst:components/git-lfs.bst
   - freedesktop-sdk.bst:components/git.bst
