@@ -17,6 +17,8 @@ aliases:
   dbmx: https://dbmx.net/
   dotat: https://dotat.at/prog/
   fedora_rpms: https://src.fedoraproject.org/rpms/
+  ghostty_deps: https://deps.files.ghostty.org/
+  ghostty_releases: https://release.files.ghostty.org/
 
   flathub: https://flathub.org/repo/
   freedesktop_files: https://gitlab.freedesktop.org/
@@ -55,6 +57,7 @@ aliases:
   thekelleys: http://www.thekelleys.org.uk/
   videolan_pub: https://download.videolan.org/pub/
   webkitgtk: https://webkitgtk.org/releases/
+  ziglang: https://ziglang.org/
 
 
   # git aliases go here
