@@ -44,8 +44,18 @@ build:
     just bst artifact checkout oci/bluefin.bst --directory /src/.build-out
 
     echo "==> Loading OCI image into podman..."
-    sudo skopeo copy oci:.build-out containers-storage:{{image_name}}:{{image_tag}}
+    sudo skopeo copy oci:.build-out containers-storage:{{image_name}}:{{image_tag}}-raw
     rm -rf .build-out
+
+    # bootc requires images to not have both /etc and /usr/etc.
+    # Parent layers from freedesktop-sdk may contain /usr/etc that we
+    # cannot fix at the BuildStream level, so we fix the combined image
+    # with a Containerfile fixup layer.
+    echo "==> Fixing /etc layout for bootc compatibility..."
+    printf 'FROM %s\nRUN if [ -d /usr/etc ]; then cp -a /usr/etc/. /etc/ && rm -rf /usr/etc; fi\n' \
+        "{{image_name}}:{{image_tag}}-raw" \
+        | sudo podman build --security-opt label=type:unconfined_t --squash-all -t "{{image_name}}:{{image_tag}}" -f - .
+    sudo podman rmi "{{image_name}}:{{image_tag}}-raw" || true
 
     echo "==> Build complete. Image loaded as {{image_name}}:{{image_tag}}"
     sudo podman images | grep -E "{{image_name}}|REPOSITORY" || true
