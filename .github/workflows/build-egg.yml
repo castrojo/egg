@@ -526,7 +526,7 @@ jobs:
         run: |
           podman run --rm --privileged \
             -v /var/lib/containers:/var/lib/containers \
-            "${{ steps.export.outputs.image_ref }}" \
+            "localhost/${{ steps.export.outputs.image_ref }}" \
             bootc container lint
 
       # ── Upload build logs ─────────────────────────────────────────────
