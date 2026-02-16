@@ -48,6 +48,9 @@ jobs:
 
       - name: Install Homebrew
         run: |
+          # Create cache directory first (sticky disk may prevent auto-creation)
+          sudo mkdir -p /home/runner/.cache/Homebrew
+          sudo chown -R runner:runner /home/runner/.cache/Homebrew
           # Install Homebrew directly (non-interactive mode for CI)
           NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           # Add Homebrew to PATH for subsequent steps
