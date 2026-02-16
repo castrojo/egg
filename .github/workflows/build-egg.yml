@@ -169,9 +169,9 @@ jobs:
         continue-on-error: true
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          sudo podman tag "${{ steps.export.outputs.image_ref }}" \
+          sudo podman tag "localhost/${{ steps.export.outputs.image_ref }}" \
             "${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
-          sudo podman tag "${{ steps.export.outputs.image_ref }}" \
+          sudo podman tag "localhost/${{ steps.export.outputs.image_ref }}" \
             "${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
 
       - name: Push to GHCR
