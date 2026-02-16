@@ -1,5 +1,7 @@
 # BST Pipeline Skills Implementation Plan
 
+> **Status: COMPLETED** -- All skills created successfully. The following skills now exist in `.opencode/skills/`: adding-a-package, buildstream-element-reference, packaging-pre-built-binaries, packaging-zig-projects, packaging-rust-cargo-projects, packaging-gnome-shell-extensions, packaging-go-projects, oci-layer-composition, patching-upstream-junctions, removing-packages, updating-upstream-refs, debugging-bst-build-failures, ci-pipeline-operations, and local-e2e-testing. AGENTS.md skill index updated. Renovate BST2_IMAGE sync gap fixed.
+
 > **For agents:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Create 10 new skills and update 4 existing skills to cover every stage of the Bluefin BuildStream build pipeline, from "I want to add a package" through "it ships in the OCI image."

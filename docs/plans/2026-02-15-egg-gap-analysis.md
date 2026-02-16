@@ -1,5 +1,7 @@
 # Egg Gap Analysis & Curated Package Additions
 
+> **Status: PARTIALLY IMPLEMENTED** -- Three of four packages complete: glow, gum, and fzf are present in `elements/bluefin/`. Caffeine GNOME Shell extension is not yet implemented. The gap analysis research (egg vs production Bluefin) in this plan remains the definitive reference for understanding egg's positioning as a curated subset, not a 1:1 clone.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Close the most impactful gaps between egg and production Bluefin with four curated package additions: Caffeine extension, glow, gum, and fzf.

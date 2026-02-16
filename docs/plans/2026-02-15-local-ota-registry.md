@@ -1,5 +1,7 @@
 # Local OTA Registry Implementation Plan
 
+> **Status: NOT IMPLEMENTED** -- This plan is complete and ready to execute but has not been implemented yet. The local registry workflow would enable faster local development iterations by allowing VMs to pull OTA updates from the host machine without needing to push to GHCR. Implementation should follow this plan task-by-task.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Enable local builds to serve OTA updates to VMs via a local `zot` registry, so a developer machine can build, publish, and self-update without leaving the network.

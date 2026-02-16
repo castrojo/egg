@@ -1,5 +1,7 @@
 # Fork and Customize Onboarding Plan
 
+> **Status: PARTIALLY IMPLEMENTED** -- The `just show-me-the-future` recipe exists and works. The `just preflight` command (automatic prerequisite validation and Homebrew installation) and the updated `boot-vm` recipe with Homebrew QEMU firmware detection are not yet implemented. The README update task is also pending.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Make it trivially easy for someone to fork this repo, customize the package list, and boot into their own custom Linux desktop -- all locally, no CI or cloud infrastructure needed.

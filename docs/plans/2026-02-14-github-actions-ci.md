@@ -1,6 +1,6 @@
 # GitHub Actions CI for bluefin-egg Implementation Plan
 
-> **Status: IMPLEMENTED (SUPERSEDED)** -- The workflow exists at `.github/workflows/build-egg.yml` and is more advanced than this plan. Actual implementation includes: R2 artifact cache (see `2026-02-14-cloudflare-r2-cache.md`), daily source tracking (`track-bst-sources.yml`), SHA-pinned actions, separate `bst artifact push` step, source cache seeding from upstream, and Renovate for dependency updates.
+> **Status: SUPERSEDED** -- The workflow exists at `.github/workflows/build-egg.yml` and has evolved significantly beyond this plan. The current implementation uses Blacksmith sticky disks for artifact caching (see `2026-02-15-blacksmith-sticky-disk-migration.md`) instead of `actions/cache`. The runner is `blacksmith-4vcpu-ubuntu-2404` (not `ubuntu-24.04`). R2 cache infrastructure was added then removed. Daily source tracking exists in a separate workflow. Retained for historical reference showing the initial CI architecture.
 
 > **For agents:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 

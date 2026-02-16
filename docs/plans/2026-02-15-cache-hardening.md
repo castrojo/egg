@@ -1,5 +1,7 @@
 # R2 Cache Hardening Implementation Plan
 
+> **Status: SUPERSEDED** -- This plan was written to harden the R2-based cache approach but was rendered obsolete by the migration to Blacksmith sticky disks (see `2026-02-15-blacksmith-sticky-disk-migration.md`). The R2 cache infrastructure was removed entirely from the CI workflow in commit `17bb7a1`. The issues documented here (rclone download bugs, destructive deletes, sync coordination) no longer apply. Retained for historical reference.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Eliminate all silent cache failures in the CI pipeline so that R2 cache restore/upload works reliably on every run, preventing unnecessary 2-hour cold builds.

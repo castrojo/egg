@@ -1,6 +1,6 @@
 # Cloudflare R2 Cache for BuildStream
 
-> **Status: IMPLEMENTED** -- All 4 tasks complete. Corrections discovered during implementation are documented inline below (bazel-remote v2.6.1, `--s3.auth_method=access_key`, HTTP health check on port 8080, separate `bst artifact push` command, bucket name `bst-cache`). The actual workflow also includes steps not in this plan: upstream artifact seeding, separate push step, cache proxy stats check.
+> **Status: SUPERSEDED** -- This plan was implemented but the R2 cache infrastructure was subsequently replaced by Blacksmith sticky disks in `2026-02-15-blacksmith-sticky-disk-migration.md`. The R2 preseed and sync steps were removed in commit `17bb7a1` because the R2 archive was corrupt (93 bytes despite claiming 12.9 GB) and sticky disks provide superior performance (~3 sec mount vs minutes of download/extract). Retained for historical reference showing the evolution from bazel-remote → rclone → sticky disks.
 
 > **For agents:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
